@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Madagascar Centella - Travel Kit</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght=400;600;700;900&display=swap');
   :root {
     --pink-dark:#c0566e; --pink-light:#fce8ef; --pink:#e8a0b0;
     --brown-dark:#7a5530; --brown-light:#f5ede0; --brown:#b8864e;
@@ -291,14 +291,43 @@ async function submitOrder(){
   const btn=document.getElementById('confirm-btn');
   btn.disabled=true;btn.textContent='⏳ جارٍ الإرسال...';
   const[h,o]=DELIVERY[wilaya],dc=dv==='home'?h:o,pp=PRICES[cur];
-  const payload={'الاسم':fname,'اللقب':lname,'الهاتف':phone,'الولاية':wilaya,'الدائرة':commune,
-    'العنوان':address||'غير محدد','المنتج':cur==='pink'?'سنتيلا الوردي (4500 دج)':'سنتيلا البني (4000 دج)',
-    'نوع التوصيل':dv==='home'?'منزل':'مكتب','سعر التوصيل':dc+' دج','المجموع الكلي':(pp+dc)+' دج',
-    'التاريخ':new Date().toLocaleString('ar-DZ')};
-  try{await fetch('https://script.google.com/macros/s/AKfycbzEGKEfvIUyIQVnWcIP5KqzmuQIUgygVX_BcX8-hv8fkzmxwSGvEbvyZFxhEcAL63AW6A/exec',
-    {method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}
-  catch(e){console.error(e);}
-  document.getElementById('order-card').innerHTML=`<div class="success-inner"><div class="si">✅</div><h3>تم استلام طلبك!</h3><p>سيتصل بك فريقنا قريباً على الرقم <strong>${phone}</strong></p><br><p style="color:var(--muted);font-size:13px;">المجموع: <strong>${pp+dc} دج</strong></p></div>`;
+
+  // إنشاء iframe مخفي لتجاوز CORS
+  const iframe=document.createElement('iframe');
+  iframe.style.display='none';
+  iframe.name='hf';
+  document.body.appendChild(iframe);
+
+  // إنشاء form وإرساله عبر iframe للرابط الخاص بك
+  const form=document.createElement('form');
+  form.method='POST';
+  form.action='https://script.google.com/macros/s/AKfycbzEGKEfvIUyIQVnWcIP5KqzmuQIUgygVX_BcX8-hv8fkzmxwSGvEbvyZFxhEcAL63AW6A/exec';
+  form.target='hf';
+  form.style.display='none';
+
+  const fields={
+    'الاسم':fname,'اللقب':lname,'الهاتف':phone,'الولاية':wilaya,'الدائرة':commune,
+    'العنوان':address||'غير محدد',
+    'المنتج':cur==='pink'?'سنتيلا الوردي (4500 دج)':'سنتيلا البني (4000 دج)',
+    'نوع_التوصيل':dv==='home'?'منزل':'مكتب',
+    'سعر_التوصيل':dc+' دج',
+    'المجموع_الكلي':(pp+dc)+' دج',
+    'التاريخ':new Date().toLocaleString('ar-DZ')
+  };
+
+  for(const[k,v] of Object.entries(fields)){
+    const inp=document.createElement('input');
+    inp.type='hidden'; inp.name=k; inp.value=v;
+    form.appendChild(inp);
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(()=>{
+    document.getElementById('order-card').innerHTML=`<div class="success-inner"><div class="si">✅</div><h3>تم استلام طلبك!</h3><p>سيتصل بك فريقنا قريباً على الرقم <strong>${phone}</strong></p><br><p style="color:var(--muted);font-size:13px;">المجموع: <strong>${pp+dc} دج</strong></p></div>`;
+    try{form.remove();iframe.remove();}catch(e){}
+  },2500);
 }
 </script>
 </body>
