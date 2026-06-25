@@ -301,7 +301,7 @@ async function submitOrder(){
   // إنشاء form وإرساله عبر iframe للرابط الخاص بك
   const form=document.createElement('form');
   form.method='POST';
-  form.action='https://script.google.com/macros/s/AKfycbzEGKEfvIUyIQVnWcIP5KqzmuQIUgygVX_BcX8-hv8fkzmxwSGvEbvyZFxhEcAL63AW6A/exec';
+  form.action='https://script.google.com/macros/s/AKfycbwo9nc5UxfL5zuZLBofUk49ls4NtHlmLCBY5HxcS87DyhWcZOlWPrde3F5n9kglYtVP-Q/exec';
   form.target='hf';
   form.style.display='none';
 
