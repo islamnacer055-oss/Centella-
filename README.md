@@ -296,8 +296,8 @@ async function submitOrder(){
   const[h,o]=DELIVERY[wilaya],dc=dv==='home'?h:o,pp=PRICES[cur];
 
   // --- إعدادات تلغرام المباشرة ---
-  const telegramToken = "ضع_هنا_توكن_البوت_الخاص_بك"; 
-  const chatId = "ضع_هنا_الـ_chat_id_الخاص_بك";
+  const telegramToken = "8984328868:AAEjxhYfk_Iw6PhnSEIrsTZ3zCd_7zZHiLA"; 
+  const chatId = "8765345419";
 
   const message = `🛍️ **طلب جديد من صفحة الهبوط!**\n\n` +
                   `👤 **الاسم واللقب:** ${fname} ${lname}\n` +
