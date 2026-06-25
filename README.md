@@ -287,48 +287,49 @@ async function submitOrder(){
   const fname=document.getElementById('fname').value.trim(),lname=document.getElementById('lname').value.trim(),
     phone=document.getElementById('phone').value.trim(),wilaya=document.getElementById('wilaya').value,
     commune=document.getElementById('commune').value.trim(),address=document.getElementById('address').value.trim();
-  if(!fname||!lname||!phone||!wilaya||!dv||!commune){alert('يرجى تعبئة جميع الحقول المطلوبة');return;}
+  
+  if(!fname!lname!phone!wilaya!dv||!commune){alert('يرجى تعبئة جميع الحقول المطلوبة');return;}
+  
   const btn=document.getElementById('confirm-btn');
-  btn.disabled=true;btn.textContent='⏳ جارٍ الإرسال...';
+  btn.disabled=true; btn.textContent='⏳ جارٍ الإرسال...';
+  
   const[h,o]=DELIVERY[wilaya],dc=dv==='home'?h:o,pp=PRICES[cur];
 
-  // إنشاء iframe مخفي لتجاوز CORS
-  const iframe=document.createElement('iframe');
-  iframe.style.display='none';
-  iframe.name='hf';
-  document.body.appendChild(iframe);
+  // --- إعدادات تلغرام المباشرة ---
+  const telegramToken = "ضع_هنا_توكن_البوت_الخاص_بك"; 
+  const chatId = "ضع_هنا_الـ_chat_id_الخاص_بك";
 
-  // إنشاء form وإرساله عبر iframe للرابط الخاص بك
-  const form=document.createElement('form');
-  form.method='POST';
-  form.action='https://script.google.com/macros/s/AKfycbwo9nc5UxfL5zuZLBofUk49ls4NtHlmLCBY5HxcS87DyhWcZOlWPrde3F5n9kglYtVP-Q/exec';
-  form.target='hf';
-  form.style.display='none';
+  const message = 🛍️ **طلب جديد من صفحة الهبوط!**\n\n +
+                  👤 **الاسم واللقب:** ${fname} ${lname}\n +
+                  📞 **الهاتف:** ${phone}\n +
+                  📍 **الولاية:** ${wilaya} (${commune})\n +
+     العنوان: 🏠 **العنوان:** ${address || 'غير محدد'}\n +
+     المنتج:  📦 **المنتج:** ${cur==='pink'?'سنتيلا الوردي (4500 دج)':'سنتيلا البني (4000 دج)'}\n +
+     التوصيل: 🚚 **التوصيل:** ${dv==='home'?'منزل':'مكتب'} (${dc} دج)\n +
+                  💰 **المجموع الكلي:** ${pp+dc} دج\n +
+ التاريخ:     📅 **التاريخ:** ${new Date().toLocaleString('ar-DZ')};
 
-  const fields={
-    'الاسم':fname,'اللقب':lname,'الهاتف':phone,'الولاية':wilaya,'الدائرة':commune,
-    'العنوان':address||'غير محدد',
-    'المنتج':cur==='pink'?'سنتيلا الوردي (4500 دج)':'سنتيلا البني (4000 دج)',
-    'نوع_التوصيل':dv==='home'?'منزل':'مكتب',
-    'سعر_التوصيل':dc+' دج',
-    'المجموع_الكلي':(pp+dc)+' دج',
-    'التاريخ':new Date().toLocaleString('ar-DZ')
-  };
+  try {
+    // الإرسال مباشرة إلى سيرفر تلغرام
+    const response = await fetch(https://api.telegram.org/bot${telegramToken}/sendMessage, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
 
-  for(const[k,v] of Object.entries(fields)){
-    const inp=document.createElement('input');
-    inp.type='hidden'; inp.name=k; inp.value=v;
-    form.appendChild(inp);
+    if (response.ok) {
+      // إظهار رسالة النجاح للمشتري في الصفحة
+      document.getElementById('order-card').innerHTML=<div class="success-inner"><div class="si">✅</div><h3>تم استلام طلبك!</h3><p>سيتصل بك فريقنا قريباً على الرقم <strong>${phone}</strong></p><br><p style="color:var(--muted);font-size:13px;">المجموع: <strong>${pp+dc} دج</strong></p></div>;
+    } else {
+      alert('حدث خطأ في الإرسال، يرجى المحاولة مجدداً');
+      btn.disabled=false; btn.textContent='تأكيد الطلب';
+    }
+  } catch (error) {
+    alert('مشكلة في الاتصال بالشبكة، يرجى المحاولة لاحقاً');
+    btn.disabled=false; btn.textContent='تأكيد الطلب';
   }
-
-  document.body.appendChild(form);
-  form.submit();
-
-  setTimeout(()=>{
-    document.getElementById('order-card').innerHTML=`<div class="success-inner"><div class="si">✅</div><h3>تم استلام طلبك!</h3><p>سيتصل بك فريقنا قريباً على الرقم <strong>${phone}</strong></p><br><p style="color:var(--muted);font-size:13px;">المجموع: <strong>${pp+dc} دج</strong></p></div>`;
-    try{form.remove();iframe.remove();}catch(e){}
-  },2500);
 }
-</script>
-</body>
-</html>
