@@ -288,7 +288,7 @@ async function submitOrder(){
     phone=document.getElementById('phone').value.trim(),wilaya=document.getElementById('wilaya').value,
     commune=document.getElementById('commune').value.trim(),address=document.getElementById('address').value.trim();
   
-  if(!fname!lname!phone!wilaya!dv||!commune){alert('يرجى تعبئة جميع الحقول المطلوبة');return;}
+  if(!fname||!lname||!phone||!wilaya||!dv||!commune){alert('يرجى تعبئة جميع الحقول المطلوبة');return;}
   
   const btn=document.getElementById('confirm-btn');
   btn.disabled=true; btn.textContent='⏳ جارٍ الإرسال...';
@@ -299,19 +299,18 @@ async function submitOrder(){
   const telegramToken = "ضع_هنا_توكن_البوت_الخاص_بك"; 
   const chatId = "ضع_هنا_الـ_chat_id_الخاص_بك";
 
-  const message = 🛍️ **طلب جديد من صفحة الهبوط!**\n\n +
-                  👤 **الاسم واللقب:** ${fname} ${lname}\n +
-                  📞 **الهاتف:** ${phone}\n +
-                  📍 **الولاية:** ${wilaya} (${commune})\n +
-     العنوان: 🏠 **العنوان:** ${address || 'غير محدد'}\n +
-     المنتج:  📦 **المنتج:** ${cur==='pink'?'سنتيلا الوردي (4500 دج)':'سنتيلا البني (4000 دج)'}\n +
-     التوصيل: 🚚 **التوصيل:** ${dv==='home'?'منزل':'مكتب'} (${dc} دج)\n +
-                  💰 **المجموع الكلي:** ${pp+dc} دج\n +
- التاريخ:     📅 **التاريخ:** ${new Date().toLocaleString('ar-DZ')};
+  const message = `🛍️ **طلب جديد من صفحة الهبوط!**\n\n` +
+                  `👤 **الاسم واللقب:** ${fname} ${lname}\n` +
+                  `📞 **الهاتف:** ${phone}\n` +
+                  `📍 **الولاية:** ${wilaya} (${commune})\n` +
+                  `🏠 **العنوان:** ${address || 'غير محدد'}\n` +
+                  `📦 **المنتج:** ${cur==='pink'?'سنتيلا الوردي (4500 دج)':'سنتيلا البني (4000 دج)'}\n` +
+                  `🚚 **التوصيل:** ${dv==='home'?'منزل':'مكتب'} (${dc} دج)\n` +
+                  `💰 **المجموع الكلي:** ${pp+dc} دج\n` +
+                  `📅 **التاريخ:** ${new Date().toLocaleString('ar-DZ')}`;
 
   try {
-    // الإرسال مباشرة إلى سيرفر تلغرام
-    const response = await fetch(https://api.telegram.org/bot${telegramToken}/sendMessage, {
+    const response = await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -322,8 +321,7 @@ async function submitOrder(){
     });
 
     if (response.ok) {
-      // إظهار رسالة النجاح للمشتري في الصفحة
-      document.getElementById('order-card').innerHTML=<div class="success-inner"><div class="si">✅</div><h3>تم استلام طلبك!</h3><p>سيتصل بك فريقنا قريباً على الرقم <strong>${phone}</strong></p><br><p style="color:var(--muted);font-size:13px;">المجموع: <strong>${pp+dc} دج</strong></p></div>;
+      document.getElementById('order-card').innerHTML=`<div class="success-inner"><div class="si">✅</div><h3>تم استلام طلبك!</h3><p>سيتصل بك فريقنا قريباً على الرقم <strong>${phone}</strong></p><br><p style="color:var(--muted);font-size:13px;">المجموع: <strong>${pp+dc} دج</strong></p></div>`;
     } else {
       alert('حدث خطأ في الإرسال، يرجى المحاولة مجدداً');
       btn.disabled=false; btn.textContent='تأكيد الطلب';
@@ -333,3 +331,6 @@ async function submitOrder(){
     btn.disabled=false; btn.textContent='تأكيد الطلب';
   }
 }
+</script>
+</body>
+</html>
